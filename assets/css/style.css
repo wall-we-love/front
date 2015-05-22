@@ -1,0 +1,31 @@
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #080808;
+}
+
+.wall {
+    background-image: url("../images/wall.jpg");
+    background-size: 1920px 1080px;
+    background-repeat: no-repeat;
+    width: 1920px;
+    height: 1080px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 20px;
+    background-color: #080808;
+}
+
+#right-panel {
+    position: fixed;
+    height: 100%;
+    width: 500px;
+    top: 0;
+    right: 0;
+    background-color: rgba(181, 184, 177, 0.6);
+}
