@@ -1,5 +1,6 @@
 header {
     position: fixed;
+    z-index: 1;
     top: 0;
     width: 100%;
     background-color: #080808;
@@ -11,6 +12,8 @@ header {
     background-repeat: no-repeat;
     width: 1920px;
     height: 1080px;
+    position: relative;
+    overflow: hidden;
 }
 
 footer {
@@ -28,4 +31,30 @@ footer {
     top: 0;
     right: 0;
     background-color: rgba(181, 184, 177, 0.6);
+}
+
+.draggable {
+    -webkit-transform: translate(0px, 0px);
+    transform: translate(0px, 0px);
+}
+
+#drag-1, #drag-2 {
+    width: 25%;
+    height: 100%;
+    min-height: 6.5em;
+    margin: 10%;
+
+    background-color: #29e;
+    color: white;
+
+    border-radius: 0.75em;
+    padding: 4%;
+
+    -webkit-transform: translate(0px, 0px);
+    transform: translate(0px, 0px);
+}
+
+#drag-me::before {
+    content: "#" attr(id);
+    font-weight: bold;
 }

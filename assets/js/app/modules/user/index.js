@@ -9,22 +9,26 @@ var moduleName = module.exports = 'wwlUser';
 
 angular.module(moduleName, [
     require('../global/index'),
-    require('../../../adapters/base64')
+    require('../../../adapters/base64'),
+    require('../../../adapters/angular-cookies')
 ]).factory('userFactory', [
     '$q',
     '$http',
     '$base64',
+    '$cookies',
     require('../global/services/global'),
-    function ($q, $http, $base64, globalService) {
+    function ($q, $http, $base64, $cookies, globalService) {
 
-        var user = {};
+        var user = {
+            token: $cookies.token
+        };
 
         var login = function (options) {
             return $http.post(globalService.apiUrl + '/user/token/email', {}, {
                 headers: { 'Authorization': 'Basic ' + $base64.encode(options.email + ':' + options.password) }
             })
-                .then(function (body) {
-                    user.token = body.value;
+                .then(function (res) {
+                    $cookies.token = user.token = res.data.value;
                     return true;
                 });
         };
@@ -41,9 +45,9 @@ angular.module(moduleName, [
 
         var getMe = function () {
             return $http.get(globalService.apiUrl + '/me', { headers: { 'Authorization': 'Bearer ' + user.token } })
-                .then(function (me) {
-                    user.id = me.id;
-                    user.email = me.email;
+                .then(function (res) {
+                    user.id = res.data.id;
+                    user.email = res.data.email;
                     return user;
                 });
         };
@@ -55,11 +59,24 @@ angular.module(moduleName, [
             });
         };
 
+        var postPoster = function (poster) {
+            return $http.post(globalService.apiUrl + '/posters', {
+                name: poster.name,
+                description: poster.description,
+                pos_x: poster.pos_x,
+                pos_y: poster.pos_y,
+                height: poster.height,
+                width: poster.width,
+                fileData: poster.fileData
+            }, { headers: { 'Authorization': 'Bearer ' + user.token } });
+        };
+
         return {
             user: user,
             login: login,
             register: register,
-            isLogged: isLogged
+            isLogged: isLogged,
+            postPoster: postPoster
         };
 
 }]).controller('registerController', [

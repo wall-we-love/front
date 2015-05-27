@@ -7,5 +7,8 @@ var angular = require('../adapters/angular');
 
 angular.module('wwl', [
     require('./modules/user'),
-    require('./modules/panel')
+    require('./modules/panel'),
+    require('./modules/posterUpload'),
+    require('./modules/wall'),
+    require('./modules/poster')
 ]);
