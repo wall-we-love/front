@@ -81,14 +81,16 @@ angular.module(moduleName, [
         };
 
         var postPoster = function (poster) {
+            console.log('post', poster);
             return $http.post(globalService.apiUrl + '/posters', {
-                name: poster.name,
                 description: poster.description,
                 pos_x: poster.pos_x,
                 pos_y: poster.pos_y,
                 height: poster.height,
                 width: poster.width,
-                fileData: poster.fileData
+                fileData: poster.fileData,
+                link: poster.link,
+                tags: poster.tags
             }, { headers: { 'Authorization': 'Bearer ' + user.token } });
         };
 

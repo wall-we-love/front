@@ -12,6 +12,8 @@ var app = angular.module('wwl', [
     require('./modules/wall'),
     require('./modules/poster'),
     require('./modules/navbar'),
+    require('./modules/poster-modal'),
+    require('../adapters/angular-bootstrap'),
     require('../adapters/angular-animate')
 ]);
 

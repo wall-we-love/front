@@ -19,27 +19,16 @@ angular.module(moduleName, ['wwlUser'])
                 link: function (scope, element) {
 
                     scope.poster = {
-                        ready: false
+                        ready: false,
+                        hideDrop: false,
+                        link: '',
+                        description: '',
+                        tags: ''
                     };
 
                     var dropZone = element[0].querySelector('.drop-zone');
                     var canvas = document.createElement('canvas');
 
-                    function dragMoveListener (event) {
-                        var target = event.target,
-                        // keep the dragged position in the data-x/data-y attributes
-                            x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-                            y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-                        // translate the element
-                        target.style.webkitTransform =
-                            target.style.transform =
-                                'translate(' + x + 'px, ' + y + 'px)';
-
-                        // update the posiion attributes
-                        target.setAttribute('data-x', x);
-                        target.setAttribute('data-y', y);
-                    }
 
                     dropZone.addEventListener('dragover', function (evt) {
                         evt.stopPropagation();
@@ -58,27 +47,50 @@ angular.module(moduleName, ['wwlUser'])
                             reader.onload = function (e) {
                                 var img = new Image;
                                 img.onload = function () {
-                                    canvas.setAttribute('width', this.width + 'px');
-                                    canvas.setAttribute('height', this.height + 'px');
                                     var dropZonePosition = dropZone.getBoundingClientRect();
                                     console.log(dropZonePosition);
+                                    canvas.setAttribute('width', (dropZonePosition.width - 26 - 10) + 'px');
+                                    canvas.setAttribute('height', (this.height * (dropZonePosition.width - 26 - 10) / this.width) + 'px');
                                     canvas.style.position = 'absolute';
-                                    canvas.style.top = dropZonePosition.top + 10 + 'px';
-                                    canvas.style.left = dropZonePosition.left + 'px';
-                                    dropZone.style.height = this.height + 'px';
+                                    canvas.style.top = dropZonePosition.top + 'px';
+                                    canvas.style.left = dropZonePosition.left + 3 + 'px';
                                     canvas.className = 'draggable';
+                                    canvas.style.zIndex = 1302;
+                                    dropZone.style.border = 'none';
                                     $document[0].body.insertBefore(canvas, null);
+                                    var canvasBounding = canvas.getBoundingClientRect();
+                                    dropZone.style.height = canvasBounding.height + 'px';
                                     var canvasCtx = canvas.getContext('2d');
-                                    canvasCtx.drawImage(this, 0, 0, this.width, this.height);
+                                    canvasCtx.drawImage(this, 0, 0, canvasBounding.width, canvasBounding.height);
                                     var interactable = interact('.draggable');
                                     interactable
                                         .draggable({
-                                            onmove: dragMoveListener,
+                                            onmove: function dragMoveListener (event) {
+                                                var target = event.target,
+                                                // keep the dragged position in the data-x/data-y attributes
+                                                    x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+                                                    y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+                                                if (x < -260 && y > -50) {
+                                                    target.style.zIndex = 2;
+                                                    scope.$apply(function () {
+                                                        scope.poster.hideDrop = true;
+                                                    });
+                                                }
+                                                // translate the element
+                                                target.style.webkitTransform =
+                                                    target.style.transform =
+                                                        'translate(' + x + 'px, ' + y + 'px)';
+
+                                                // update the posiion attributes
+                                                target.setAttribute('data-x', x);
+                                                target.setAttribute('data-y', y);
+                                            },
                                             // call this function on every dragend event
                                             onend: function (event) {}
                                         })
                                         .resizable({
-                                            edges: { left: true, right: true, bottom: true, top: true }
+                                            edges: { left: true, right: true, bottom: true }
                                         })
                                         .on('resizemove', function (event) {
                                             var target = event.target,
@@ -116,12 +128,11 @@ angular.module(moduleName, ['wwlUser'])
                                     pos_x: pos.left,
                                     pos_y: pos.top,
                                     height: pos.height,
-                                    width: pos.width
-                                })
-                                    .then(function () {
-                                        console.log("YOLO");
-                                    });
-                                console.log('penis');
+                                    width: pos.width,
+                                    link: scope.poster.link,
+                                    description: scope.poster.description,
+                                    tags: scope.poster.tags
+                                });
                             };
                         }
 

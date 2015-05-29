@@ -13,32 +13,50 @@ angular.module(moduleName, [require('../modules/global')])
         'globalService',
         function ($http, globalService) {
             this.getPosters = function () {
-                return $http.get(globalService.apiUrl + '/posters');
+                return $http.get(globalService.apiUrl + '/posters')
+                    .then(function (res) {
+                        return res.data;
+                    });
             }
         }
     ])
+    .filter('search', function () {
+        return function (posters, tagsString) {
+            if (!posters) return posters;
+            var tags = tagsString.split(' ');
+            if (tags.length === 0) return posters;
+            return posters.filter(function (poster) {
+                for (var tag in tags) {
+                    if (poster.tags.search(tags[tag]) >= 0) return true;
+                }
+                return false;
+            });
+        }
+    })
     .directive('wall', [
-        '$compile',
         'wallService',
-        function ($compile, wallService) {
+        function (wallService) {
             return {
                 restrict: 'E',
                 templateUrl: 'assets/html/wall.html',
                 replace: true,
-                link: function ($scope, $element) {
+                controller: ['$scope', function ($scope) {
+
+                    this.models = {
+                        filter: ''
+                    };
+                    var self = this;
+
+                    $scope.$on('filterChange', function (e, filter) {
+                        self.models.filter = filter;
+                    });
+
                     wallService.getPosters()
                         .then(function (posters) {
-                            console.log(posters);
-                            posters.data.forEach(function (poster) {
-                                console.log($element[0]);
-                                console.log(poster);
-                                var posterTag = $compile('<poster poster-id="' + poster.id + '"></poster>')($scope);
-                                //$element[0].appendChild(posterTag);
-                                $element.append(posterTag);
-                                console.log(posterTag);
-                            });
+                            self.models.posters = posters;
                         });
-                }
+                }],
+                controllerAs: 'wallCtrl'
             }
         }
     ]);

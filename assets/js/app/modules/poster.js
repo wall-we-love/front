@@ -13,36 +13,43 @@ angular.module(moduleName, [require('./global')])
         'globalService',
         function ($http, globalService) {
             this.getPoster = function (posterId) {
-                return $http.get(globalService.apiUrl + '/posters/' + posterId);
+                return $http.get(globalService.apiUrl + '/posters/' + posterId)
+                    .then(function (res) {
+                        return res.data;
+                    });
             }
         }
     ])
     .directive('poster', [
+        '$rootScope',
         'posterService',
-        function (posterService) {
+        function ($rootScope, posterService) {
             return {
                 restrict: 'E',
                 templateUrl: 'assets/html/poster.html',
                 replace: true,
                 scope: {
-                    posterId: '@'
+                    posterId: '='
                 },
                 link: function ($scope, $element) {
-                    $scope.yolo = function () {
-                        console.log('HELLO');
+
+                    $scope.models = {};
+
+                    $scope.clickPoster = function () {
+                        $rootScope.$broadcast('posterClick', $scope.models.poster);
                     };
+
                     posterService.getPoster($scope.posterId)
-                        .then(function (data) {
+                        .then(function (poster) {
+                            $scope.models.poster = poster;
                             var imgTag = new Image();
-                            imgTag.src = data.data.fileData;
+                            imgTag.src = poster.fileData;
                             imgTag.style.position = 'absolute';
-                            imgTag.style.top = data.data.pos_y + 'px';
-                            imgTag.style.left = data.data.pos_x + 'px';
-                            imgTag.style.width = data.data.width + 'px';
-                            imgTag.style.height = data.data.height + 'px';
+                            imgTag.style.top = poster.pos_y + 'px';
+                            imgTag.style.left = poster.pos_x + 'px';
+                            imgTag.style.width = poster.width + 'px';
+                            imgTag.style.height = poster.height + 'px';
                             $element.append(imgTag);
-                            console.log(imgTag);
-                            console.log(data);
                         })
                 }
             }
