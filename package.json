@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "gulp bower javascript",
-    "javscript": "gulp javascript",
+    "javascript": "gulp javascript",
     "serve": "http-server"
   },
   "repository": {

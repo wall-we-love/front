@@ -22,12 +22,12 @@ angular.module(moduleName, [require('../modules/global')])
     ])
     .filter('search', function () {
         return function (posters, tagsString) {
-            if (!posters) return posters;
+            if (!posters || !tagsString) return posters;
             var tags = tagsString.split(' ');
             if (tags.length === 0) return posters;
             return posters.filter(function (poster) {
                 for (var tag in tags) {
-                    if (poster.tags.search(tags[tag]) >= 0) return true;
+                    if (tags.hasOwnProperty(tag) && poster.tags.search(tags[tag]) >= 0) return true;
                 }
                 return false;
             });
