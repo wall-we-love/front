@@ -1,8 +1,22 @@
 <div class="row">
-    <div class="col-md-12">
-        <div class="row drop-zone">
-            <h3>DROP YOUR FILE</h3>
-            <button class="btn" ng-click="clickPost()" ng-show="poster.ready">POST</button>
+    <div class="col-md-12" style="margin-bottom: 20px">
+        <div class="row drop-zone text-center" style="margin: 5px;padding: 5px; border: dashed 3px">
+            <h3 ng-hide="poster.ready">DROP YOUR FILE</h3>
         </div>
+        <form>
+            <div class="form-group">
+                <label for="exampleInputEmail1">Tags</label>
+                <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Enter tags">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Description</label>
+                <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Description">
+            </div>
+            <div class="form-group">
+                <label for="exampleInputPassword1">Description</label>
+                <input type="text" class="form-control" id="exampleInputPassword1" placeholder="Description">
+            </div>
+            <button type="submit" ng-click="clickPost()" class="btn btn-success form-control">Submit</button>
+        </form>
     </div>
 </div>

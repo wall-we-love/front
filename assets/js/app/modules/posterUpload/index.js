@@ -11,8 +11,9 @@ var interact = require('../../../../../bower_components/interact/interact');
 
 angular.module(moduleName, ['wwlUser'])
     .directive('posterUpload', [
+        '$document',
         'userFactory',
-        function (userFactory) {
+        function ($document, userFactory) {
             return {
                 restrict: 'E',
                 link: function (scope, element) {
@@ -59,23 +60,19 @@ angular.module(moduleName, ['wwlUser'])
                                 img.onload = function () {
                                     canvas.setAttribute('width', this.width + 'px');
                                     canvas.setAttribute('height', this.height + 'px');
+                                    var dropZonePosition = dropZone.getBoundingClientRect();
+                                    console.log(dropZonePosition);
+                                    canvas.style.position = 'absolute';
+                                    canvas.style.top = dropZonePosition.top + 10 + 'px';
+                                    canvas.style.left = dropZonePosition.left + 'px';
+                                    dropZone.style.height = this.height + 'px';
                                     canvas.className = 'draggable';
-                                    dropZone.insertBefore(canvas, null);
+                                    $document[0].body.insertBefore(canvas, null);
                                     var canvasCtx = canvas.getContext('2d');
                                     canvasCtx.drawImage(this, 0, 0, this.width, this.height);
                                     var interactable = interact('.draggable');
                                     interactable
                                         .draggable({
-                                            // enable inertial throwing
-                                            inertia: true,
-                                            // keep the element within the area of it's parent
-                                            autoScroll: {
-                                                container: window,
-                                                margin: 50,
-                                                distance: 10,
-                                                interval: 10
-                                            },
-                                            // call this function on every dragmove event
                                             onmove: dragMoveListener,
                                             // call this function on every dragend event
                                             onend: function (event) {}
@@ -130,7 +127,8 @@ angular.module(moduleName, ['wwlUser'])
 
                     }, false);
                 },
-                templateUrl: 'assets/html/poster/poster.html'
+                templateUrl: 'assets/html/poster/poster.html',
+                replace: true
             };
         }
     ]);

@@ -7,7 +7,9 @@ var moduleName = module.exports = 'wwlPanel';
 
 var angular = require('../../../adapters/angular');
 
-angular.module(moduleName, [require('../user/index')])
+angular.module(moduleName, [
+    require('../user/index')
+])
     .factory('panelFactory', [
         function () {
 
@@ -25,33 +27,52 @@ angular.module(moduleName, [require('../user/index')])
         }
     ])
     .controller('panelController', [
+        '$scope',
         'panelFactory',
         'userFactory',
-        function (panelFactory, userFactory) {
+        function ($scope, panelFactory, userFactory) {
 
             var self = this;
+            self.display = false;
 
             this.setPage = function (page) {
                 if (page == 'home') {
                     userFactory.isLogged()
-                        .then(function () {
-                            self.page = panelFactory.pages['home'];
-                        })
-                        .catch(function () {
-                            self.page = panelFactory.pages['not-logged']
+                        .then(function (status) {
+                            if (status) {
+                                self.page = panelFactory.pages['home'];
+                            } else {
+                                self.page = panelFactory.pages['not-logged']
+                            }
                         });
                 } else {
                     self.page = panelFactory.pages[page];
                 }
             };
 
+            $scope.$on('togglePanel', function (e, data) {
+                console.log('LTL');
+                console.log(data);
+                self.display = data;
+            });
+
+            $scope.$on('loggedIn', function () {
+                self.setPage('home');
+            });
+
+            $scope.$on('loggedOff', function () {
+                self.setPage('home');
+            });
+
             this.register = {
-                success: function () {
-                    self.setPage('home');
-                },
+                success: function () {},
                 cancel: function () {
                     self.setPage('home');
                 }
+            };
+
+            this.facebookLogin = function () {
+                userFactory.initFacebookLogin();
             };
 
             self.setPage('home');
