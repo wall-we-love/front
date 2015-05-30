@@ -3,28 +3,40 @@
  */
 'use strict';
 
-var moduleName = module.exports = 'wwlNavbar';
+var moduleName = module.exports = 'wwl.navbar';
 
 var angular = require('../../adapters/angular');
 
 angular.module(moduleName, [])
     .controller('navbarController', [
-        '$scope',
-        '$rootScope',
-        function ($scope, $rootScope) {
+        '$location', '$scope', '$rootScope',
+        function ($location, $scope, $rootScope) {
             var self = this;
             this.panelDisplay = false;
 
             this.models = {};
 
+            $scope.$watch(function () {
+                return $location.search();
+            }, function (res) {
+                self.models.filter = res.tag;
+            }, true);
+
+            var updateTag = function () {
+                $location.search('tag', self.models.filter);
+            };
+
+            this.searchKeyPress = updateTag;
+
+            this.clickDismiss = function () {
+                self.models.filter = '';
+                updateTag();
+            };
+
             this.togglePanel = function () {
                 self.panelDisplay = !self.panelDisplay;
                 $rootScope.$broadcast('togglePanel', self.panelDisplay);
             };
-
-            $scope.$watch(function () { return self.models.filter }, function (current) {
-                $rootScope.$broadcast('filterChange', current);
-            }, true);
         }
     ])
     .directive('navbar', [
@@ -32,7 +44,7 @@ angular.module(moduleName, [])
             return {
                 restrict: 'E',
                 replace: true,
-                templateUrl: 'assets/html/navbar.html',
+                templateUrl: '/assets/html/navbar.html',
                 controller: 'navbarController',
                 controllerAs: 'navbarCtrl'
             }

@@ -3,17 +3,18 @@
  */
 'use strict';
 
-var moduleName = module.exports = 'wwlWall';
+var moduleName = module.exports = 'wwl.wall';
 
 var angular = require('../../adapters/angular');
 
-angular.module(moduleName, [require('../modules/global')])
+angular.module(moduleName, [
+    require('./constants')
+])
     .service('wallService', [
-        '$http',
-        'globalService',
-        function ($http, globalService) {
+        '$http', 'API',
+        function ($http, API) {
             this.getPosters = function () {
-                return $http.get(globalService.apiUrl + '/posters')
+                return $http.get(API.URI + '/posters')
                     .then(function (res) {
                         return res.data;
                     });
@@ -40,16 +41,18 @@ angular.module(moduleName, [require('../modules/global')])
                 restrict: 'E',
                 templateUrl: 'assets/html/wall.html',
                 replace: true,
-                controller: ['$scope', function ($scope) {
+                controller: ['$scope', '$location', function ($scope, $location) {
 
                     this.models = {
                         filter: ''
                     };
                     var self = this;
 
-                    $scope.$on('filterChange', function (e, filter) {
-                        self.models.filter = filter;
-                    });
+                    $scope.$watch(function () {
+                        return $location.search();
+                    }, function (value) {
+                        self.models.filter = value.tag;
+                    }, true);
 
                     wallService.getPosters()
                         .then(function (posters) {

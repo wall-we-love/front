@@ -3,22 +3,49 @@
  */
 'use strict';
 
-var angular = require('../../../adapters/angular');
+var angular = require('../../adapters/angular');
 
-var moduleName = module.exports = 'wwlUser';
+var moduleName = module.exports = 'wwl.user';
 
 angular.module(moduleName, [
-    require('../global/index'),
-    require('../../../adapters/base64'),
-    require('../../../adapters/angular-cookies')
+    require('./constants'),
+    require('../../adapters/base64'),
+    require('../../adapters/angular-cookies')
+]).run([
+    '$window', 'userFactory', 'FB',
+    function($window, userFactory, FB_CONST) {
+
+        $window.fbAsyncInit = function() {
+
+            FB.init({
+                appId: FB_CONST.APP_ID,
+                status: true,
+                xfbml: true,
+                version: 'v2.3'
+            });
+
+            userFactory.startFacebook();
+
+        };
+
+        (function(d){
+            var js,
+                id = 'facebook-jssdk',
+                ref = d.getElementsByTagName('script')[0];
+            if (d.getElementById(id)) {
+                return;
+            }
+            js = d.createElement('script');
+            js.id = id;
+            js.async = true;
+            js.src = "//connect.facebook.net/en_US/sdk.js";
+            ref.parentNode.insertBefore(js, ref);
+        }(document));
+
+    }
 ]).factory('userFactory', [
-    '$q',
-    '$http',
-    '$base64',
-    '$cookies',
-    '$rootScope',
-    require('../global/services/global'),
-    function ($q, $http, $base64, $cookies, $rootScope, globalService) {
+    '$q', '$http', '$base64', '$cookies', '$rootScope', 'API',
+    function ($q, $http, $base64, $cookies, $rootScope, API) {
 
         var user = {
             token: $cookies.token
@@ -31,7 +58,7 @@ angular.module(moduleName, [
         };
 
         var login = function (options) {
-            return $http.post(globalService.apiUrl + '/user/token/email', {}, {
+            return $http.post(API.URI + '/user/token/email', {}, {
                 headers: { 'Authorization': 'Basic ' + $base64.encode(options.email + ':' + options.password) }
             })
                 .then(function (res) {
@@ -40,7 +67,7 @@ angular.module(moduleName, [
         };
 
         var facebookLogin = function (opts) {
-            return $http.post(globalService.apiUrl + '/user/token/facebook', {
+            return $http.post(API.URI + '/user/token/facebook', {
                 access_token: opts.access_token
             })
                 .then(function (res) {
@@ -49,7 +76,7 @@ angular.module(moduleName, [
         };
 
         var register = function (options) {
-            return $http.post(globalService.apiUrl + '/user/register/email', options)
+            return $http.post(API.URI + '/user/register/email', options)
                 .catch(function () {
                     return false;
                 })
@@ -59,7 +86,7 @@ angular.module(moduleName, [
         };
 
         var getMe = function () {
-            return $http.get(globalService.apiUrl + '/me', { headers: { 'Authorization': 'Bearer ' + user.token } })
+            return $http.get(API.URI + '/me', { headers: { 'Authorization': 'Bearer ' + user.token } })
                 .then(function (res) {
                     user.id = res.data.id;
                     user.email = res.data.email;
@@ -82,16 +109,7 @@ angular.module(moduleName, [
 
         var postPoster = function (poster) {
             console.log('post', poster);
-            return $http.post(globalService.apiUrl + '/posters', {
-                description: poster.description,
-                pos_x: poster.pos_x,
-                pos_y: poster.pos_y,
-                height: poster.height,
-                width: poster.width,
-                fileData: poster.fileData,
-                link: poster.link,
-                tags: poster.tags
-            }, { headers: { 'Authorization': 'Bearer ' + user.token } });
+            return $http.post(API.URI + '/posters', poster, { headers: { 'Authorization': 'Bearer ' + user.token } });
         };
 
         var startFacebook = function () {
@@ -122,8 +140,7 @@ angular.module(moduleName, [
         };
 
 }]).controller('registerController', [
-    'userFactory',
-    '$scope',
+    'userFactory', '$scope',
     function (userFactory, $scope) {
 
         var self = this;
@@ -137,8 +154,7 @@ angular.module(moduleName, [
 
     }
 ]).controller('loginController', [
-    'userFactory',
-    '$scope',
+    'userFactory', '$scope',
     function (userFactory, $scope) {
 
         var self = this;
@@ -157,7 +173,7 @@ angular.module(moduleName, [
             restrict: 'E',
             controller: 'registerController',
             controllerAs: 'registerCtrl',
-            templateUrl: 'assets/html/user/register.html',
+            templateUrl: '/assets/html/user/register.html',
             scope: {
                 onCancel: '=',
                 onSuccess: '='
@@ -170,7 +186,7 @@ angular.module(moduleName, [
             restrict: 'E',
             controller: 'loginController',
             controllerAs: 'loginCtrl',
-            templateUrl: 'assets/html/user/login.html',
+            templateUrl: '/assets/html/user/login.html',
             scope: {
                 onCancel: '=',
                 onSuccess: '='

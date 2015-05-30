@@ -3,16 +3,15 @@
  */
 'use strict';
 
-var moduleName = module.exports = 'wwlPosterUpload';
+var moduleName = module.exports = 'wwl.posterUpload';
 
-var angular = require('../../../adapters/angular');
+var angular = require('../../adapters/angular');
 
-var interact = require('../../../../../bower_components/interact/interact');
+var interact = require('../../../../bower_components/interact/interact');
 
-angular.module(moduleName, ['wwlUser'])
+angular.module(moduleName, ['wwl.user'])
     .directive('posterUpload', [
-        '$document',
-        'userFactory',
+        '$document', 'userFactory',
         function ($document, userFactory) {
             return {
                 restrict: 'E',
@@ -122,11 +121,13 @@ angular.module(moduleName, ['wwlUser'])
 
                             scope.clickPost = function () {
                                 var tmpImg = canvas.toDataURL("image/png");
+                                var documentPosition = $document[0].body.getBoundingClientRect();
+                                console.log(documentPosition);
                                 var pos = canvas.getBoundingClientRect();
                                 userFactory.postPoster({
                                     fileData: tmpImg,
-                                    pos_x: pos.left,
-                                    pos_y: pos.top,
+                                    pos_x: pos.left * 100 / documentPosition.width,
+                                    pos_y: pos.top * 100 / documentPosition.height,
                                     height: pos.height,
                                     width: pos.width,
                                     link: scope.poster.link,

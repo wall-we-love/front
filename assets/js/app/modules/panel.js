@@ -3,12 +3,12 @@
  */
 'use strict';
 
-var moduleName = module.exports = 'wwlPanel';
+var moduleName = module.exports = 'wwl.panel';
 
-var angular = require('../../../adapters/angular');
+var angular = require('../../adapters/angular');
 
 angular.module(moduleName, [
-    require('../user/index')
+    require('./user')
 ])
     .factory('panelFactory', [
         function () {
@@ -27,9 +27,7 @@ angular.module(moduleName, [
         }
     ])
     .controller('panelController', [
-        '$scope',
-        'panelFactory',
-        'userFactory',
+        '$scope', 'panelFactory', 'userFactory',
         function ($scope, panelFactory, userFactory) {
 
             var self = this;
@@ -51,8 +49,6 @@ angular.module(moduleName, [
             };
 
             $scope.$on('togglePanel', function (e, data) {
-                console.log('LTL');
-                console.log(data);
                 self.display = data;
             });
 

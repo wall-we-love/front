@@ -3,7 +3,7 @@
  */
 'use strict';
 
-var moduleName = module.exports = 'wwlPosterModal';
+var moduleName = module.exports = 'wwl.posterModal';
 
 var angular = require('../../adapters/angular');
 
@@ -13,9 +13,8 @@ angular.module(moduleName, [])
             return {
                 restrict: 'E',
                 controller: [
-                    '$scope',
-                    '$modal',
-                    function ($scope, $modal) {
+                    '$scope', '$modal', '$location',
+                    function ($scope, $modal, $location) {
 
                         this.models = {};
                         var self = this;
@@ -31,6 +30,11 @@ angular.module(moduleName, [])
                                     $scope.models = {
                                         poster: poster
                                     };
+
+                                    $scope.clickTag = function (tag) {
+                                        $location.search('tag', tag);
+                                        modalInstance.dismiss();
+                                    }
                                 }]
                             });
                         });
